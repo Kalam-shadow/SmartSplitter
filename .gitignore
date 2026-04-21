@@ -38,4 +38,6 @@ lerna-debug.log*
 REFACTOR_SUMMARY.md
 ARCHITECTURE.md
 QUICKSTART.md
+FIXES_APPLIED.md
+FIXES_SIDE_BY_SIDE.md
 package-lock.json
