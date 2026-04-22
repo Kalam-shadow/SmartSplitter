@@ -27,11 +27,6 @@ export const ExpenseList = () => {
     return member ? member.name : 'Unknown';
   };
 
-  // Helper function to get participants names
-  const getParticipantsNames = (participantIds) => {
-    return participantIds.map(id => getMemberName(id)).join(', ');
-  };
-
   const handleEdit = (expense) => {
     startEditing(expense);
   };
@@ -60,7 +55,8 @@ export const ExpenseList = () => {
                 <div className="expense-col description">Description</div>
                 <div className="expense-col paid-by">Paid By</div>
                 <div className="expense-col amount">Amount (₹)</div>
-                <div className="expense-col participants">Participants</div>
+                <div className="expense-col category">Category</div>
+                <div className="expense-col date">Date</div>
                 <div className="expense-col actions">Actions</div>
               </div>
 
@@ -73,7 +69,12 @@ export const ExpenseList = () => {
                     <div className="expense-col description">{expense.description}</div>
                     <div className="expense-col paid-by">{getMemberName(expense.paidBy)}</div>
                     <div className="expense-col amount">₹{expense.amount}</div>
-                    <div className="expense-col participants">{getParticipantsNames(expense.participants)}</div>
+                    <div className="expense-col category">
+                      <span className="category-tag">{expense.category || 'Other'}</span>
+                    </div>
+                    <div className="expense-col date">
+                      {new Date(expense.createdAt).toLocaleDateString()}
+                    </div>
                     <div className="expense-col actions">
                       <button
                         className="btn btn-secondary btn-small"

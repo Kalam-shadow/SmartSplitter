@@ -1,13 +1,16 @@
 import React from 'react';
-import { ExpenseProvider } from './context/ExpenseContext';
+import { ExpenseProvider, useExpenseContext } from './context/ExpenseContext';
 import { GroupSelector } from './components/GroupSelector';
 import { GroupForm } from './components/GroupForm';
 import { Dashboard } from './pages/Dashboard';
+import { Toast } from './components/Toast';
 import './styles/index.css';
 import './styles/dashboard.css';
 import './styles/sections.css';
 
 function AppContent() {
+  const { toast, showToast } = useExpenseContext();
+
   return (
     <div className="app">
       <header className="app-header">
@@ -27,6 +30,14 @@ function AppContent() {
       <footer className="app-footer">
         <p>Smart Expense Splitter © 2026 | Data saved locally</p>
       </footer>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => showToast(null)}
+        />
+      )}
     </div>
   );
 }

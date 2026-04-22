@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useExpenseContext } from '../context/ExpenseContext';
 import { calculateBalances, calculateTotalSpent } from '../utils/balanceCalculator';
 import { simplifyDebts, getSpendingBreakdown } from '../utils/debtSimplifier';
+import { CategoryChart } from './CategoryChart';
 import '../styles/sections.css';
 
 export const SummarySection = () => {
@@ -31,6 +32,35 @@ export const SummarySection = () => {
     return getSpendingBreakdown(currentGroup.expenses);
   }, [currentGroup]);
 
+  const insights = useMemo(() => {
+    if (!currentGroup || !currentGroup.expenses.length) return {};
+
+    // Top spender
+    const memberSpending = {};
+    currentGroup.members.forEach(member => {
+      memberSpending[member.id] = { name: member.name, paid: 0 };
+    });
+
+    currentGroup.expenses.forEach(expense => {
+      if (memberSpending[expense.paidBy]) {
+        memberSpending[expense.paidBy].paid += expense.amount;
+      }
+    });
+
+    const topSpender = Object.values(memberSpending).reduce((max, member) =>
+      member.paid > max.paid ? member : max, { paid: 0 });
+
+    // Most spent category
+    const mostSpentCategory = Object.entries(spendingBreakdown).reduce((max, [category, amount]) =>
+      amount > max.amount ? { category, amount } : max, { amount: 0 });
+
+    return {
+      topSpender: topSpender.paid > 0 ? topSpender : null,
+      mostSpentCategory: mostSpentCategory.amount > 0 ? mostSpentCategory : null,
+      totalTransactions: currentGroup.expenses.length,
+    };
+  }, [currentGroup, spendingBreakdown]);
+
   if (!currentGroup) {
     return (
       <section className="dashboard-section summary-section">
@@ -51,7 +81,7 @@ export const SummarySection = () => {
           <div className="summary-card">
             <h4>Total Spent</h4>
             <div className="summary-value">₹{totalSpent.toFixed(2)}</div>
-            <p className="summary-label">{currentGroup.expenses.length} expenses</p>
+            <p className="summary-label">{insights.totalTransactions} transactions</p>
           </div>
 
           {/* Members Count Card */}
@@ -61,6 +91,24 @@ export const SummarySection = () => {
             <p className="summary-label">in group</p>
           </div>
 
+          {/* Top Spender Card */}
+          {insights.topSpender && (
+            <div className="summary-card">
+              <h4>Top Spender</h4>
+              <div className="summary-value">{insights.topSpender.name}</div>
+              <p className="summary-label">₹{insights.topSpender.paid.toFixed(2)} paid</p>
+            </div>
+          )}
+
+          {/* Most Spent Category Card */}
+          {insights.mostSpentCategory && (
+            <div className="summary-card">
+              <h4>Top Category</h4>
+              <div className="summary-value">{insights.mostSpentCategory.category}</div>
+              <p className="summary-label">₹{insights.mostSpentCategory.amount.toFixed(2)} spent</p>
+            </div>
+          )}
+
           {/* Unsettled Debts Card */}
           <div className="summary-card">
             <h4>Debts to Settle</h4>
@@ -68,6 +116,11 @@ export const SummarySection = () => {
             <p className="summary-label">transactions</p>
           </div>
         </div>
+
+        {/* Category Chart */}
+        {Object.keys(spendingBreakdown).length > 0 && (
+          <CategoryChart spendingBreakdown={spendingBreakdown} />
+        )}
 
         {/* Balances */}
         {currentGroup.members.length > 0 && (

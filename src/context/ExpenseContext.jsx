@@ -7,6 +7,7 @@ export const ExpenseProvider = ({ children }) => {
   const [groups, setGroups] = useState([]);
   const [currentGroupId, setCurrentGroupId] = useState(null);
   const [editingExpense, setEditingExpense] = useState(null);
+  const [toast, setToast] = useState(null);
 
   // Load data on mount
   useEffect(() => {
@@ -45,6 +46,11 @@ export const ExpenseProvider = ({ children }) => {
 
   const cancelEditing = () => {
     setEditingExpense(null);
+  };
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type, id: Date.now() });
+    setTimeout(() => setToast(null), 3000);
   };
 
   // Create a new group
@@ -135,6 +141,7 @@ export const ExpenseProvider = ({ children }) => {
     });
 
     setGroups(updatedGroups);
+    showToast('Expense added ✓');
   };
 
   // Update an existing expense in current group
@@ -156,6 +163,7 @@ export const ExpenseProvider = ({ children }) => {
     });
 
     setGroups(updatedGroups);
+    showToast('Expense updated ✓');
   };
 
   // Delete expense from current group
@@ -173,6 +181,7 @@ export const ExpenseProvider = ({ children }) => {
     });
 
     setGroups(updatedGroups);
+    showToast('Expense deleted ✓');
   };
 
   // Switch to different group
@@ -201,6 +210,8 @@ export const ExpenseProvider = ({ children }) => {
     cancelEditing,
 
     switchGroup,
+    toast,
+    showToast,
   };
 
   return <ExpenseContext.Provider value={value}>{children}</ExpenseContext.Provider>;

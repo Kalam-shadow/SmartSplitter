@@ -40,7 +40,9 @@ export const MemberList = () => {
       </form>
 
       {currentGroup.members.length === 0 ? (
-        <p className="empty-state">No members yet</p>
+        <div className="empty-placeholder">
+          <p>Add members to start tracking expenses</p>
+        </div>
       ) : (
         <div className="member-items">
           {currentGroup.members.map((member) => (
