@@ -23,6 +23,8 @@
   padding: 1.5rem;
   box-shadow: var(--shadow-sm);
   margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .header-content {
@@ -50,7 +52,7 @@
 /* Top Section: 3 Columns */
 .dashboard-top {
   display: grid;
-  grid-template-columns: 1fr 1.2fr 1.5fr;
+  grid-template-columns: 0.8fr 1.2fr 2fr;
   gap: 0.5rem;
   height: auto;
 }

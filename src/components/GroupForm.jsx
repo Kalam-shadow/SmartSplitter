@@ -16,21 +16,24 @@ export const GroupForm = ({ onGroupCreated }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form">
-      <div className="form-group">
-        <label htmlFor="groupName">Group Name</label>
+    <form onSubmit={handleSubmit} className="group-form">
+      <label htmlFor="groupName" className="group-label">
+        Create Group
+      </label>
+      <div className="group-controls">
         <input
           id="groupName"
           type="text"
+          className="group-input"
           value={groupName}
           onChange={(e) => setGroupName(e.target.value)}
-          placeholder="Enter group name (e.g., Trip, Roommates)"
+          placeholder="Enter group name"
           required
         />
+        <button type="submit" className="btn btn-primary">
+          Create
+        </button>
       </div>
-      <button type="submit" className="btn btn-primary">
-        Create Group
-      </button>
     </form>
   );
 };

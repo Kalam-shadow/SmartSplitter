@@ -11,8 +11,13 @@ export const GroupSelector = () => {
 
   return (
     <div className="group-selector">
-      <div className="group-dropdown">
+      <label htmlFor="groupSelector" className="group-label">
+        Selected Group
+      </label>
+      <div className="group-controls">
         <select
+          id="groupSelector"
+          className="group-select"
           value={currentGroup?.id || ''}
           onChange={(e) => switchGroup(e.target.value)}
         >
@@ -23,19 +28,19 @@ export const GroupSelector = () => {
             </option>
           ))}
         </select>
+        {currentGroup && (
+          <button
+            className="btn btn-danger btn-sm"
+            onClick={() => {
+              if (window.confirm(`Delete "${currentGroup.name}"?`)) {
+                deleteGroup(currentGroup.id);
+              }
+            }}
+          >
+            Delete
+          </button>
+        )}
       </div>
-      {currentGroup && (
-        <button
-          className="btn btn-danger btn-sm"
-          onClick={() => {
-            if (window.confirm(`Delete "${currentGroup.name}"?`)) {
-              deleteGroup(currentGroup.id);
-            }
-          }}
-        >
-          Delete Group
-        </button>
-      )}
     </div>
   );
 };

@@ -12,6 +12,55 @@
   display: none;
 }
 
+/* Group Form & Selector Shared Styles */
+.group-form,
+.group-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: stretch;
+}
+
+.group-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin: 0;
+}
+
+.group-controls {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.group-input,
+.group-select {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  height: 32px;
+  transition: all 0.15s ease;
+}
+
+.group-input:hover,
+.group-select:hover {
+  border-color: var(--primary-color);
+}
+
+.group-input:focus,
+.group-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.2);
+}
+
 .group-selector {
   display: flex;
   gap: 0.4rem;
@@ -19,6 +68,7 @@
   padding: 0;
   background-color: transparent;
   border-radius: 0;
+  height: auto;
 }
 
 .group-dropdown {
@@ -28,14 +78,15 @@
 
 .group-dropdown select {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.4rem 0.6rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.15s ease;
+  height: 32px;
 }
 
 .group-dropdown select:hover {
