@@ -251,8 +251,8 @@
 .expense-list-header-row,
 .expense-list-row {
   display: grid;
-  grid-template-columns: 2fr 1.2fr 0.8fr 1fr 1fr 0.9fr;
-  gap: 0.4rem;
+  grid-template-columns: 1.4fr 1.1fr 1.1fr 1.2fr 1fr 1.2fr;
+  gap: 0.5rem;
   padding: 0.4rem;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
@@ -301,6 +301,7 @@
 
 .expense-col.amount {
   text-align: right;
+  padding: 0.2rem 0.4rem;
   font-weight: 600;
   color: var(--primary-color);
 }
