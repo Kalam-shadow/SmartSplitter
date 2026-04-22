@@ -1,21 +1,25 @@
 import React from 'react';
-import { GroupSection } from '../components/GroupSection';
-import { ExpenseSection } from '../components/ExpenseSection';
+import { MembersPanel } from '../components/MembersPanel';
+import { ExpenseForm } from '../components/ExpenseForm';
+import { ExpenseList } from '../components/ExpenseList';
 import { SummarySection } from '../components/SummarySection';
+import { InsightsPanel } from '../components/InsightsPanel';
 import '../styles/dashboard.css';
 
 export const Dashboard = () => {
   return (
     <div className="dashboard">
-      {/* Top Section: 2 Columns */}
+      {/* Top Section: 3 Columns */}
       <div className="dashboard-top">
-        <GroupSection />
-        <ExpenseSection />
+        <MembersPanel />
+        <ExpenseForm />
+        <ExpenseList />
       </div>
 
-      {/* Bottom Section: Full Width Summary */}
+      {/* Bottom Section: 2 Columns */}
       <div className="dashboard-bottom">
         <SummarySection />
+        <InsightsPanel />
       </div>
     </div>
   );

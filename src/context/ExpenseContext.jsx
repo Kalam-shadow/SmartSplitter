@@ -6,6 +6,7 @@ export const ExpenseContext = createContext();
 export const ExpenseProvider = ({ children }) => {
   const [groups, setGroups] = useState([]);
   const [currentGroupId, setCurrentGroupId] = useState(null);
+  const [editingExpense, setEditingExpense] = useState(null);
 
   // Load data on mount
   useEffect(() => {
@@ -23,6 +24,11 @@ export const ExpenseProvider = ({ children }) => {
     saveGroups(groups);
   }, [groups]);
 
+  // Clear editing expense when switching groups
+  useEffect(() => {
+    setEditingExpense(null);
+  }, [currentGroupId]);
+
   // Save current group ID whenever it changes
   useEffect(() => {
     if (currentGroupId) {
@@ -31,6 +37,15 @@ export const ExpenseProvider = ({ children }) => {
   }, [currentGroupId]);
 
   const currentGroup = groups.find((g) => g.id === currentGroupId) || null;
+
+
+  const startEditing = (expense) => {
+    setEditingExpense(expense);
+  };
+
+  const cancelEditing = () => {
+    setEditingExpense(null);
+  };
 
   // Create a new group
   const createGroup = (groupName) => {
@@ -122,6 +137,27 @@ export const ExpenseProvider = ({ children }) => {
     setGroups(updatedGroups);
   };
 
+  // Update an existing expense in current group
+  const updateExpense = (updatedExpense) => {
+    if (!currentGroup) return;
+
+    const updatedGroups = groups.map((g) => {
+      if (g.id === currentGroupId) {
+        return {
+          ...g,
+          expenses: g.expenses.map((exp) =>
+            exp.id === updatedExpense.id
+              ? { ...updatedExpense, updatedAt: new Date().toISOString() }
+              : exp
+          ),
+        };
+      }
+      return g;
+    });
+
+    setGroups(updatedGroups);
+  };
+
   // Delete expense from current group
   const deleteExpense = (expenseId) => {
     if (!currentGroup) return;
@@ -150,12 +186,20 @@ export const ExpenseProvider = ({ children }) => {
     groups,
     currentGroup,
     currentGroupId,
+
     createGroup,
     deleteGroup,
     addMember,
     removeMember,
+
+    updateExpense,
     addExpense,
     deleteExpense,
+
+    editingExpense,
+    startEditing,
+    cancelEditing,
+
     switchGroup,
   };
 

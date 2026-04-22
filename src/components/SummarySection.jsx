@@ -8,24 +8,28 @@ export const SummarySection = () => {
   const { currentGroup } = useExpenseContext();
 
   const balances = useMemo(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (!currentGroup) return {};
     return calculateBalances(currentGroup.expenses, currentGroup.members);
-  }, [currentGroup?.expenses, currentGroup?.members]);
+  }, [currentGroup]);
 
   const totalSpent = useMemo(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (!currentGroup) return 0;
     return calculateTotalSpent(currentGroup.expenses);
-  }, [currentGroup?.expenses]);
+  }, [currentGroup]);
 
   const settlements = useMemo(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (!currentGroup) return [];
     return simplifyDebts(balances);
-  }, [balances]);
+  }, [balances, currentGroup]);
 
   const spendingBreakdown = useMemo(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (!currentGroup) return {};
     return getSpendingBreakdown(currentGroup.expenses);
-  }, [currentGroup?.expenses]);
+  }, [currentGroup]);
 
   if (!currentGroup) {
     return (

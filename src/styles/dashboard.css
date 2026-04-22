@@ -16,17 +16,70 @@
   }
 }
 
-/* Top Section: 2 Columns */
+/* Header */
+.dashboard-header {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.app-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* Top Section: 3 Columns */
 .dashboard-top {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 25% 35% 40%;
   gap: 1.5rem;
 }
 
-/* Bottom Section: Full Width */
+.expense-form-wrapper {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.expense-form-wrapper:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.expense-form-wrapper h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+/* Bottom Section: 2 Columns */
 .dashboard-bottom {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
 }
 
 /* Dashboard Section Base */

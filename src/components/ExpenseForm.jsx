@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useExpenseContext } from '../context/ExpenseContext';
 import { categorizeExpense } from '../utils/balanceCalculator';
 import '../styles/components.css';
 
 export const ExpenseForm = ({ onExpenseAdded }) => {
-  const { currentGroup, addExpense } = useExpenseContext();
+  // const { currentGroup, addExpense } = useExpenseContext();
+
+  const {
+    currentGroup,
+    addExpense,
+    updateExpense,
+    editingExpense,
+    cancelEditing
+  } = useExpenseContext();
+
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
@@ -14,12 +23,49 @@ export const ExpenseForm = ({ onExpenseAdded }) => {
   });
   const [customAmounts, setCustomAmounts] = useState({});
 
+
+  const isEditing = !!editingExpense;
+
+  useEffect(() => {
+    if (editingExpense) {
+      setFormData({
+        description: editingExpense.description || '',
+        amount: editingExpense.amount?.toString() || '',
+        paidBy: editingExpense.paidBy || '',
+        participants: editingExpense.participants || [],
+        splitType: editingExpense.splitType || 'equal',
+      });
+      setCustomAmounts(editingExpense.customAmounts || {});
+    } else {
+      setFormData({
+        description: '',
+        amount: '',
+        paidBy: '',
+        participants: [],
+        splitType: 'equal',
+      });
+      setCustomAmounts({});
+    }
+  }, [editingExpense]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleCancel = () => {
+    cancelEditing();
+    setFormData({
+      description: '',
+      amount: '',
+      paidBy: '',
+      participants: [],
+      splitType: 'equal',
+    });
+    setCustomAmounts({});
   };
 
   const handleParticipantChange = (memberId) => {
@@ -55,18 +101,20 @@ export const ExpenseForm = ({ onExpenseAdded }) => {
       return;
     }
 
+    // Validate custom split
     if (formData.splitType === 'custom') {
       const totalCustom = formData.participants.reduce(
         (sum, pId) => sum + (customAmounts[pId] || 0),
         0
       );
+
       if (Math.abs(totalCustom - parseFloat(formData.amount)) > 0.01) {
-        alert('Custom split amounts must equal the total expense amount');
+        alert('Custom split must match total amount');
         return;
       }
     }
 
-    const expense = {
+    const payload = {
       description: formData.description,
       amount: parseFloat(formData.amount),
       paidBy: formData.paidBy,
@@ -76,7 +124,18 @@ export const ExpenseForm = ({ onExpenseAdded }) => {
       category: categorizeExpense(formData.description),
     };
 
-    addExpense(expense);
+    if (isEditing) {
+      updateExpense({
+        ...editingExpense,
+        ...payload,
+        updatedAt: new Date().toISOString(),
+      });
+      cancelEditing();
+    } else {
+      addExpense(payload);
+    }
+
+    // reset form
     setFormData({
       description: '',
       amount: '',
@@ -84,55 +143,69 @@ export const ExpenseForm = ({ onExpenseAdded }) => {
       participants: [],
       splitType: 'equal',
     });
-    setCustomAmounts({});
 
-    if (onExpenseAdded) onExpenseAdded();
+    setCustomAmounts({});
   };
 
   if (!currentGroup || currentGroup.members.length === 0) {
     return (
-      <div className="empty-state">
-        Create a group and add members before adding expenses
-      </div>
+      <section className="dashboard-section expense-form-section">
+        <div className="section-content">
+          <h3>Add Expense</h3>
+          <div className="empty-placeholder">
+            <p>Create a group and add members before adding expenses</p>
+          </div>
+        </div>
+      </section>
     );
   }
 
-  const equalSplitAmount = formData.amount
+  const equalSplitAmount = formData.amount && formData.participants.length > 0
     ? (parseFloat(formData.amount) / formData.participants.length).toFixed(2)
     : 0;
 
   return (
-    <form onSubmit={handleSubmit} className="form">
-      <div className="form-group">
-        <label htmlFor="description">Description</label>
-        <input
-          id="description"
-          type="text"
-          name="description"
-          value={formData.description}
-          onChange={handleInputChange}
-          placeholder="e.g., Lunch, Gas, Hotel"
-          required
-        />
-      </div>
+    <section className="dashboard-section expense-form-section">
+      <div className="section-content">
+        <h3>Add Expense</h3>
+        <form onSubmit={handleSubmit} className="form">
 
-      <div className="form-group">
-        <label htmlFor="amount">Amount (₹)</label>
-        <input
-          id="amount"
-          type="number"
-          name="amount"
-          value={formData.amount}
-          onChange={handleInputChange}
-          placeholder="0.00"
-          step="0.01"
-          min="0"
-          required
-        />
-      </div>
+          {isEditing && (
+            <div className="edit-banner">
+              Editing: <strong>{editingExpense.description}</strong>
+            </div>
+          )}
 
-      <div className="form-group">
-        <label htmlFor="paidBy">Paid By</label>
+          <div className="form-group">
+            <label htmlFor="description">Description</label>
+            <input
+              id="description"
+              type="text"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="e.g., Lunch, Gas, Hotel"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="amount">Amount (₹)</label>
+            <input
+              id="amount"
+              type="number"
+              name="amount"
+              value={formData.amount}
+              onChange={handleInputChange}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="paidBy">Paid By</label>
         <select
           id="paidBy"
           name="paidBy"
@@ -210,9 +283,25 @@ export const ExpenseForm = ({ onExpenseAdded }) => {
         </div>
       </div>
 
-      <button type="submit" className="btn btn-primary">
-        Add Expense
+      <button
+        type="submit"
+        className="btn btn-primary"
+        disabled={
+          !formData.description ||
+          !formData.amount ||
+          !formData.paidBy ||
+          formData.participants.length === 0
+        }>
+        {isEditing ? 'Update Expense' : 'Add Expense'}
       </button>
-    </form>
+
+      {isEditing && (
+        <button type="button" onClick={handleCancel} className="btn">
+          Cancel
+        </button>
+      )}
+        </form>
+      </div>
+    </section>
   );
 };
