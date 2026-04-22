@@ -42,11 +42,11 @@
 }
 
 .member-list-container .input-with-button {
-  gap: 0.3rem;
+  gap: 0.1rem;
 }
 
 .member-list-container .input-with-button input {
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   padding: 0.4rem;
 }
 
@@ -391,8 +391,10 @@
   font-size: 1.1rem;
   color: var(--primary-color);
   text-align: right;
-  flex-shrink: 0;
+  flex-shrink: 1;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .summary-value-name {
@@ -400,7 +402,7 @@
   font-size: 0.85rem;
   color: var(--text-primary);
   text-align: right;
-  flex-shrink: 0;
+  flex-shrink: 1;
   max-width: 70%;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -1,11 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useExpenseContext } from '../context/ExpenseContext';
 import { calculateBalances, calculateTotalSpent } from '../utils/balanceCalculator';
-import { simplifyDebts } from '../utils/debtSimplifier';
+import { simplifyDebts, getSpendingBreakdown } from '../utils/debtSimplifier';
+import { generateInsights } from '../utils/aiInsights';
 import '../styles/sections.css';
 
 export const InsightsPanel = () => {
   const { currentGroup } = useExpenseContext();
+  const [loadingInsights, setLoadingInsights] = useState(false);
+  const [aiInsights, setAiInsights] = useState([]);
 
   const balances = useMemo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -25,6 +28,46 @@ export const InsightsPanel = () => {
     return calculateTotalSpent(currentGroup.expenses);
   }, [currentGroup]);
 
+  const spendingBreakdown = useMemo(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!currentGroup) return {};
+    return getSpendingBreakdown(currentGroup.expenses);
+  }, [currentGroup]);
+
+  const memberBalances = Object.entries(balances).map(([memberId, balance]) => {
+    const member = currentGroup?.members.find(m => m.id === memberId);
+    return {
+      name: member?.name || 'Unknown',
+      balance: balance.net
+    };
+  }).sort((a, b) => b.balance - a.balance);
+
+  const topSpender = memberBalances[0];
+  const mostOwed = memberBalances[memberBalances.length - 1];
+
+  const handleGenerateInsights = async () => {
+    if (!currentGroup) return;
+    setLoadingInsights(true);
+    setAiInsights([]);
+    try {
+      const data = {
+        total: totalSpent,
+        topSpender: topSpender ? `${topSpender.name} (₹${topSpender.balance.toFixed(0)})` : 'None',
+        categories: spendingBreakdown,
+        transactions: currentGroup.expenses.length
+      };
+      const result = await generateInsights(data);
+      // Split by newline and filter out empty strings
+      const lines = result.split('\n').filter(line => line.trim().length > 0);
+      setAiInsights(lines);
+    } catch (error) {
+      console.error(error);
+      setAiInsights(["Failed to generate insights."]);
+    } finally {
+      setLoadingInsights(false);
+    }
+  };
+
   if (!currentGroup) {
     return (
       <section className="dashboard-section insights-section">
@@ -38,21 +81,32 @@ export const InsightsPanel = () => {
     );
   }
 
-  const memberBalances = Object.entries(balances).map(([memberId, balance]) => {
-    const member = currentGroup.members.find(m => m.id === memberId);
-    return {
-      name: member?.name || 'Unknown',
-      balance: balance.net // Use the net balance for calculations
-    };
-  }).sort((a, b) => b.balance - a.balance);
-
-  const topSpender = memberBalances[0];
-  const mostOwed = memberBalances[memberBalances.length - 1];
-
   return (
     <section className="dashboard-section insights-section">
       <div className="section-content">
-        <h3>Insights & Suggestions</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3>Insights & Suggestions</h3>
+          <button 
+            className="btn btn-primary btn-sm" 
+            onClick={handleGenerateInsights}
+            disabled={loadingInsights || currentGroup.expenses.length === 0}
+          >
+            {loadingInsights ? 'Generating...' : 'Generate AI Insights'}
+          </button>
+        </div>
+
+        {aiInsights.length > 0 && (
+          <div className="insight-card ai-insights-card" style={{ marginBottom: '0.8rem', borderLeft: '3px solid #d4af37' }}>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span role="img" aria-label="sparkles">✨</span> AI Insights
+            </h4>
+            <ul style={{ paddingLeft: '1.2rem', margin: '0.5rem 0', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              {aiInsights.map((insight, idx) => (
+                <li key={idx} style={{ marginBottom: '0.3rem' }}>{insight.replace(/^[*-\s]+/, '')}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="insights-grid">
           {/* Quick Stats */}
